@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>จัดการสินค้า (Admin)</title>
+  <!-- โหลด Google Font Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0 20px 20px 20px;
+      padding-top: 120px; /* เว้นที่ header */
+      color: #2c3e50;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
+
+    /* แถบชื่อร้านด้านบน */
+    #header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #007bff;
+      color: red;
+      font-weight: 600;
+      font-size: 2.4rem;
+      padding: 18px 0;
+      text-align: center;
+      letter-spacing: 1.5px;
+      border-bottom: 3px solid white;
+      box-sizing: border-box;
+      z-index: 1001;
+      -webkit-text-stroke: 1.2px white;
+      text-shadow:
+        -2px -2px 0 white,
+         2px -2px 0 white,
+        -2px  2px 0 white,
+         2px  2px 0 white;
+      user-select: none;
+    }
+
+    /* ปุ่มแก้รหัสผู้ดูแล ขวาบน */
+    #change-password-btn {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      width: 140px;
+      padding: 10px 0;
+      background-color: #2980b9;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: background-color 0.3s ease;
+      z-index: 1002;
+      user-select: none;
+    }
+    #change-password-btn:hover {
+      background-color: #1f6391;
+    }
+
+    /* ปุ่มลูกศรกลับ ซ้ายบน */
+    #back-to-user-btn {
+      position: fixed;
+      top: 15px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      background-color: #2980b9;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 40px;
+      text-align: center;
+      user-select: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: background-color 0.3s ease;
+      z-index: 1002;
+    }
+    #back-to-user-btn:hover {
+      background-color: #1f6391;
+    }
+
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      max-width: 500px;
+      margin: 0 auto 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    form input[type="text"],
+    form select,
+    form input[type="file"],
+    form input[type="number"] {
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline-offset: 2px;
+      outline-color: #2980b9;
+      transition: border-color 0.3s ease;
+    }
+    form input[type="text"]:focus,
+    form select:focus,
+    form input[type="number"]:focus {
+      border-color: #2980b9;
+    }
+    form button {
+      background-color: #2980b9;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    form button:hover {
+      background-color: #1f6391;
+    }
+
+    #message {
+      text-align: center;
+      font-weight: bold;
+      min-height: 24px;
+      margin-bottom: 20px;
+      color: #e74c3c;
+    }
+
+    #product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+    }
+    .product-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+    .product-card h3 {
+      margin: 0;
+      color: #34495e;
+    }
+    .status {
+      font-weight: bold;
+      color: #27ae60;
+    }
+    .status.out-of-stock {
+      color: #e74c3c;
+    }
+    .product-card img {
+      max-width: 100%;
+      border-radius: 8px;
+      object-fit: contain;
+      height: 180px;
+    }
+    .button-group {
+      margin-top: auto;
+      display: flex;
+      gap: 10px;
+    }
+    button.edit-btn,
+    button.delete-btn {
+      flex: 1;
+      padding: 10px 0;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    button.edit-btn {
+      background-color: #2980b9;
+    }
+    button.edit-btn:hover {
+      background-color: #1f6391;
+    }
+    button.delete-btn {
+      background-color: #e74c3c;
+    }
+    button.delete-btn:hover {
+      background-color: #b53022;
+    }
+
+    .price-retail {
+      background-color: #d1f0d1;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      display: block;
+      max-width: fit-content;
+    }
+    .price-wholesale {
+      background-color: #d1d9f0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      display: block;
+      max-width: fit-content;
+    }
+
+    #edit-form-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgb(0 0 0 / 0.15);
+      max-width: 500px;
+      margin: 20px auto;
+      display: none;
+    }
+    #edit-form-container h3 {
+      margin-top: 0;
+      color: #34495e;
+      text-align: center;
+    }
+    #edit-product-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    #edit-product-form input[type="text"],
+    #edit-product-form select,
+    #edit-product-form input[type="file"],
+    #edit-product-form input[type="number"] {
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline-offset: 2px;
+      outline-color: #2980b9;
+      transition: border-color 0.3s ease;
+    }
+    #edit-product-form input[type="text"]:focus,
+    #edit-product-form select:focus,
+    #edit-product-form input[type="number"]:focus {
+      border-color: #2980b9;
+    }
+    #edit-product-form button {
+      background-color: #2980b9;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #edit-product-form button:hover {
+      background-color: #1f6391;
+    }
+    #edit-product-form #cancel-edit {
+      background-color: #95a5a6;
+      margin-top: 5px;
+    }
+    #edit-product-form #cancel-edit:hover {
+      background-color: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-bar">G.Y.FROZEN FOOD</div>
+
+  <button id="back-to-user-btn" title="กลับหน้า User">&#8592;</button>
+  <button id="change-password-btn">แก้รหัสผู้ดูแล</button>
+
+  <h1>จัดการสินค้า</h1>
+
+  <form id="add-product-form">
+    <h2>เพิ่มสินค้าใหม่</h2>
+    <input type="text" name="name" placeholder="ชื่อสินค้า" required />
+    <select name="available">
+      <option value="true">มีสินค้า</option>
+      <option value="false">สินค้าหมด</option>
+    </select>
+    <input type="number" step="0.01" min="0" name="retailPrice" placeholder="ราคาปลีก (บาท)" required />
+    <input type="number" step="0.01" min="0" name="wholesalePrice" placeholder="ราคาส่ง (บาท)" required />
+    <input type="file" name="image" accept="image/*" />
+    <button type="submit">เพิ่มสินค้า</button>
+  </form>
+
+  <p id="message"></p>
+
+  <div id="product-list"></div>
+
+  <div id="edit-form-container"></div>
+
+  <script>
+    const backBtn = document.getElementById('back-to-user-btn');
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'user.html'; // เปลี่ยนลิงก์เป็นหน้าผู้ใช้ตามจริง
+    });
+
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    changePasswordBtn.addEventListener('click', () => {
+      const newPass = prompt('กรุณากรอกรหัสผู้ดูแลใหม่');
+      if (newPass) {
+        alert('รหัสผู้ดูแลถูกเปลี่ยนเรียบร้อย (จำลอง)');
+        // TODO: ทำ API เปลี่ยนรหัสจริง ๆ ที่ backend
+      }
+    });
+
+    if(localStorage.getItem("role") !== "admin") {
+      alert("คุณไม่มีสิทธิ์เข้าหน้านี้ กรุณาเข้าสู่ระบบผู้ดูแล");
+      window.location.href = "user.html";
+    }
+
+    const productListEl = document.getElementById("product-list");
+    const messageEl = document.getElementById("message");
+    const addForm = document.getElementById("add-product-form");
+    const editFormContainer = document.getElementById("edit-form-container");
+
+    async function loadProducts() {
+      productListEl.innerHTML = "กำลังโหลดข้อมูล...";
+      messageEl.textContent = "";
+      try {
+        const res = await fetch("http://localhost:3000/api/products");
+        const products = await res.json();
+
+        if (products.length === 0) {
+          productListEl.textContent = "ไม่มีสินค้าในระบบ";
+          return;
+        }
+
+        productListEl.innerHTML = "";
+        products.forEach(p => {
+          const div = document.createElement("div");
+          div.className = "product-card";
+
+          const title = document.createElement("h3");
+          title.textContent = p.name;
+          div.appendChild(title);
+
+          const status = document.createElement("p");
+          status.textContent = p.available ? "มีสินค้า" : "สินค้าหมด";
+          status.className = "status";
+          if (!p.available) status.classList.add("out-of-stock");
+          div.appendChild(status);
+
+          const priceRetail = document.createElement("p");
+          priceRetail.textContent = `ราคาปลีก: ${p.retailPrice.toFixed(2)} บาท`;
+          priceRetail.classList.add("price-retail");
+          div.appendChild(priceRetail);
+
+          const priceWholesale = document.createElement("p");
+          priceWholesale.textContent = `ราคาส่ง: ${p.wholesalePrice.toFixed(2)} บาท`;
+          priceWholesale.classList.add("price-wholesale");
+          div.appendChild(priceWholesale);
+
+          if (p.imageUrl) {
+            const img = document.createElement("img");
+            img.src = p.imageUrl;
+            img.alt = p.name;
+            div.appendChild(img);
+          }
+
+          const btnGroup = document.createElement("div");
+          btnGroup.className = "button-group";
+
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "แก้ไข";
+          editBtn.className = "edit-btn";
+          editBtn.addEventListener("click", () => openEditForm(p));
+          btnGroup.appendChild(editBtn);
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "ลบ";
+          deleteBtn.className = "delete-btn";
+          deleteBtn.addEventListener("click", () => deleteProduct(p.id));
+          btnGroup.appendChild(deleteBtn);
+
+          div.appendChild(btnGroup);
+
+          productListEl.appendChild(div);
+        });
+      } catch {
+        productListEl.textContent = "โหลดข้อมูลล้มเหลว";
+      }
+    }
+
+    addForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      messageEl.textContent = "";
+
+      const formData = new FormData(addForm);
+
+      try {
+        const res = await fetch("http://localhost:3000/api/products?admin=true", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          messageEl.style.color = "#27ae60";
+          messageEl.textContent = "เพิ่มสินค้าสำเร็จ";
+          addForm.reset();
+          loadProducts();
+        } else {
+          messageEl.style.color = "#e74c3c";
+          messageEl.textContent = "เพิ่มสินค้าไม่สำเร็จ: " + (data.error || "");
+        }
+      } catch {
+        messageEl.style.color = "#e74c3c";
+        messageEl.textContent = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+      }
+    });
+
+    function openEditForm(product) {
+      editFormContainer.style.display = "block";
+      editFormContainer.innerHTML = `
+        <h3>แก้ไขสินค้า: ${product.name}</h3>
+        <form id="edit-product-form">
+          <input type="text" name="name" value="${product.name}" required />
+          <select name="available">
+            <option value="true" ${product.available ? "selected" : ""}>มีสินค้า</option>
+            <option value="false" ${!product.available ? "selected" : ""}>สินค้าหมด</option>
+          </select>
+          <input type="number" step="0.01" min="0" name="retailPrice" placeholder="ราคาปลีก (บาท)" value="${product.retailPrice || 0}" required />
+          <input type="number" step="0.01" min="0" name="wholesalePrice" placeholder="ราคาส่ง (บาท)" value="${product.wholesalePrice || 0}" required />
+          <input type="file" name="image" accept="image/*" />
+          <button type="submit">บันทึก</button>
+          <button type="button" id="cancel-edit">ยกเลิก</button>
+        </form>
+      `;
+
+      const editForm = document.getElementById("edit-product-form");
+      const cancelBtn = document.getElementById("cancel-edit");
+
+      editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        messageEl.textContent = "";
+
+        const formData = new FormData(editForm);
+
+        try {
+          const res = await fetch(`http://localhost:3000/api/products/${product.id}?admin=true`, {
+            method: "PUT",
+            body: formData,
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            messageEl.style.color = "#27ae60";
+            messageEl.textContent = "แก้ไขสินค้าสำเร็จ";
+            editFormContainer.style.display = "none";
+            loadProducts();
+          } else {
+            messageEl.style.color = "#e74c3c";
+            messageEl.textContent = "แก้ไขสินค้าไม่สำเร็จ: " + (data.error || "");
+          }
+        } catch {
+          messageEl.style.color = "#e74c3c";
+          messageEl.textContent = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+        }
+      });
+
+      cancelBtn.addEventListener("click", () => {
+        editFormContainer.style.display = "none";
+      });
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm("ต้องการลบสินค้านี้หรือไม่?")) return;
+
+      try {
+        const res = await fetch(`http://localhost:3000/api/products/${id}?admin=true`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          messageEl.style.color = "#27ae60";
+          messageEl.textContent = "ลบสินค้าสำเร็จ";
+          loadProducts();
+        } else {
+          messageEl.style.color = "#e74c3c";
+          messageEl.textContent = "ลบสินค้าไม่สำเร็จ: " + (data.error || "");
+        }
+      } catch {
+        messageEl.style.color = "#e74c3c";
+        messageEl.textContent = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+      }
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>

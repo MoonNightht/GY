@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>เข้าสู่ระบบผู้ดูแล</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+    .login-container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgb(0 0 0 / 0.1);
+      width: 320px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 25px;
+      color: #2980b9;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      outline-offset: 2px;
+      outline-color: #2980b9;
+      transition: border-color 0.3s ease;
+    }
+    input[type="password"]:focus {
+      border-color: #2980b9;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #2980b9;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #1f6391;
+    }
+    .error-msg {
+      color: #e74c3c;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>เข้าสู่ระบบผู้ดูแล</h1>
+    <form id="login-form">
+      <input type="password" id="password" placeholder="รหัสผ่านผู้ดูแล" required />
+      <button type="submit">เข้าสู่ระบบ</button>
+    </form>
+    <p id="error-msg" class="error-msg" style="display:none;"></p>
+  </div>
+
+  <script>
+    // รหัสผ่านเริ่มต้น (ถ้ายังไม่เคยตั้งใน localStorage)
+    const DEFAULT_ADMIN_PASS = "1234";
+
+    function getAdminPassword() {
+      return localStorage.getItem("adminPassword") || DEFAULT_ADMIN_PASS;
+    }
+
+    const loginForm = document.getElementById("login-form");
+    const errorMsg = document.getElementById("error-msg");
+
+    loginForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const password = document.getElementById("password").value.trim();
+
+      if (password === getAdminPassword()) {
+        localStorage.setItem("role", "admin");
+        window.location.href = "admin.html";
+      } else {
+        errorMsg.textContent = "รหัสผ่านไม่ถูกต้อง";
+        errorMsg.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
